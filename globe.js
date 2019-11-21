@@ -151,6 +151,9 @@ DAT.Globe = function(container, opts) {
     container.addEventListener('mousedown', onMouseDown, false);
 
     container.addEventListener('mousewheel', onMouseWheel, false);
+//Touch Screen Stuff
+    container.addEventListener('touchstart', onTouchStart, false);
+    container.addEventListener('touchmove', onTouchMove, false);
 
     document.addEventListener('keydown', onDocumentKeyDown, false);
 
@@ -285,6 +288,29 @@ DAT.Globe = function(container, opts) {
 
     container.style.cursor = 'move';
   }
+  function onTouchStart(event){
+    event.preventDefault();
+
+    mouseOnDown.x = - event.touches[0].clientX;
+    mouseOnDown.y = event.touches[0].clientY;
+
+    targetOnDown.x = target.x;
+    targetOnDown.y = target.y;
+
+    container.style.cursor = 'move';
+  }
+  function onTouchMove(event){
+    mouse.x = - event.touches[0].clientX;
+    mouse.y = event.touches[0].clientY;
+
+    var zoomDamp = distance/1000;
+
+    target.x = targetOnDown.x + (mouse.x - mouseOnDown.x) * 0.002 * zoomDamp;
+    target.y = targetOnDown.y + (mouse.y - mouseOnDown.y) * 0.002 * zoomDamp;
+    //console.log("Touch Event X: " + target.x +"\nTouch Event Y: " +target.y);
+    target.y = target.y > PI_HALF ? PI_HALF : target.y;
+    target.y = target.y < - PI_HALF ? - PI_HALF : target.y;
+  }
 
   function onMouseMove(event) {
     mouse.x = - event.clientX;
@@ -294,7 +320,7 @@ DAT.Globe = function(container, opts) {
 
     target.x = targetOnDown.x + (mouse.x - mouseOnDown.x) * 0.005 * zoomDamp;
     target.y = targetOnDown.y + (mouse.y - mouseOnDown.y) * 0.005 * zoomDamp;
-
+    //console.log("Mouse Event X: " + target.x +"\nMouse Event Y: " +target.y);
     target.y = target.y > PI_HALF ? PI_HALF : target.y;
     target.y = target.y < - PI_HALF ? - PI_HALF : target.y;
   }
